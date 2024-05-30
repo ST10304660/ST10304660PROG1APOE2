@@ -1,0 +1,161 @@
+ackage com.mycompany.st10304660poe2lebonepaballomnisiprog1a;
+
+import java.lang.reflect.Method;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+/**
+ *
+ * @author paballolenkoane
+ */
+public class LoginTest {
+    
+    public LoginTest() {
+    }
+
+    private Login login;
+
+    @BeforeEach
+    void setUp() {
+        login = new Login();
+    }
+    
+    @Test
+    public void testCheckUsernameFormatCorrect(){
+        Login login1 = new Login();
+        String testData = "Kyl_1";
+        assertTrue(login1.validateUsername(testData), "Username is correctly formatted.");
+    }
+    
+    @Test
+    public void testCheckUsernameFormatIncorrect(){
+        Login login1 = new Login();
+        String testData = "Kyle!!!!!!";
+        assertFalse(login1.validateUsername(testData), "Username is incorrectly formatted.");
+    }
+    
+    @Test
+    public void testCheckPasswordComplexityCorrect(){
+        Login login1 = new Login();
+        String testData = "Ch&&sec@k99!";
+        assertTrue(login1.validatePassword(testData), "Password complexity is correct.");
+    }
+    
+    @Test
+    public void testCheckPasswordComplexityIncorrect(){
+        Login login1 = new Login();
+        String testData = "password";
+        assertFalse(login1.validatePassword(testData), "Password complexity is incorrect.");
+    }
+    
+    @Test
+    void testGenerateTaskID() throws Exception {
+        // Access the private method generateTaskID using reflection
+        Method method = Login.class.getDeclaredMethod("generateTaskID", String.class, int.class, String.class);
+        method.setAccessible(true);
+
+        // Define test cases
+        String taskName1 = "TaskOne";
+        int taskNumber1 = 1;
+        String lastName1 = "Doe";
+
+        String taskName2 = "To";
+        int taskNumber2 = 2;
+        String lastName2 = "Smith";
+
+        String taskName3 = "ABC";
+        int taskNumber3 = 3;
+        String lastName3 = "Johnson";
+
+        // Expected results
+        String expectedID1 = "TAS:1:DOE";
+        String expectedID2 = "TO:2:ITH";
+        String expectedID3 = "ABC:3:SON";
+
+        // Invoke the method and check the results
+        String actualID1 = (String) method.invoke(login, taskName1, taskNumber1, lastName1);
+        String actualID2 = (String) method.invoke(login, taskName2, taskNumber2, lastName2);
+        String actualID3 = (String) method.invoke(login, taskName3, taskNumber3, lastName3);
+
+        // Assert the results
+        assertEquals(expectedID1, actualID1);
+        assertEquals(expectedID2, actualID2);
+        assertEquals(expectedID3, actualID3);
+    }
+    
+     @Test
+    void testShowTaskStatus_WithTasks() {
+        // Create a new Login instance
+        Login task = new Login();
+        
+        // Prepare test data: tasks and their statuses
+        List<Task> tasksToDo = new ArrayList<>();
+        tasksToDo.add(new Task("Task 1", "Description 1", "To Do", "Author 1", 2));
+        tasksToDo.add(new Task("Task 2", "Description 2", "To Do", "Author 2", 3));
+        tasksToDo.add(new Task("Task 3", "Description 3", "To Do", "Author 3", 4));
+        
+        // Set the test data in the Login instance
+        task.getTaskStatusMap().put("To Do", tasksToDo);
+        
+        // Call the method under test
+        String result = login1.showTaskStatus("To Do");
+        
+        // Prepare the expected result string
+        StringBuilder expected = new StringBuilder("Tasks in To Do:\n");
+        for (Task task : tasksToDo) {
+            expected.append(task.getName()).append("\n");
+        }
+        
+        // Assert that the returned task list matches the expected list
+        assertEquals(expected.toString(), result);
+    }
+    
+    @Test
+    public void testAddTasks() {
+        List<String> taskNames = Arrays.asList("Task 1", "Task 2", "Task 3");
+        List<String> taskDescriptions = Arrays.asList("Description 1", "Description 2", "Description 3");
+        List<String> authors = Arrays.asList("Author 1", "Author 2", "Author 3");
+        List<Integer> durations = Arrays.asList(2, 3, 4);
+        List<String> statuses = Arrays.asList("To Do", "Doing", "Done");
+
+        Login.addTasks(3, taskNames, taskDescriptions, authors, durations, statuses);
+
+        assertEquals(1, login.getTaskStatusMap().get("To Do").size());
+        assertEquals(1, login.getTaskStatusMap().get("Doing").size());
+        assertEquals(1, login.getTaskStatusMap().get("Done").size());
+
+        Login.Task task1 = login.getTaskStatusMap().get("To Do").get(0);
+        assertEquals("Task 1", task1.getName());
+        assertEquals("Description 1", task1.getDescription());
+        assertEquals("Author 1", task1.getAuthor());
+        assertEquals(2, task1.getDuration());
+        assertEquals("To Do", task1.getStatus());
+
+        Login.Task task2 = login.getTaskStatusMap().get("Doing").get(0);
+        assertEquals("Task 2", task2.getName());
+        assertEquals("Description 2", task2.getDescription());
+        assertEquals("Author 2", task2.getAuthor());
+        assertEquals(3, task2.getDuration());
+        assertEquals("Doing", task2.getStatus());
+
+        Login.Task task3 = login.getTaskStatusMap().get("Done").get(0);
+        assertEquals("Task 3", task3.getName());
+        assertEquals("Description 3", task3.getDescription());
+        assertEquals("Author 3", task3.getAuthor());
+        assertEquals(4, task3.getDuration());
+        assertEquals("Done", task3.getStatus());
+    }
+}
+    
+    
+
+    
+
+
+    
+
