@@ -1,0 +1,230 @@
+package com.mycompany.st10304660poe2lebonepaballomnisiprog1a;
+
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.swing.JOptionPane;
+
+/**
+ *
+ * @author paballolenkoane
+ */
+
+public class Login {
+
+    private String username;
+    private String password;
+    private String firstName;
+    private String lastName;
+    private String registerUser;
+    private String registerPass;
+    private int taskCount = 0;
+    final Map<String, List<Task>> taskStatusMap;//(Farrell, 2022)
+
+    public Login() {
+        taskStatusMap = new HashMap<>();//(Farrell, 2022)
+        taskStatusMap.put("To Do", new ArrayList<>());
+        taskStatusMap.put("Doing", new ArrayList<>());
+        taskStatusMap.put("Done", new ArrayList<>());
+    }
+
+    public void menu() {
+        String[] options = {"Register", "Login", "Exit"};// (Пётр , 2020)
+        String choice = (String) JOptionPane.showInputDialog(null, "Login Management System Menu", "Menu", JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
+
+        switch (choice) {
+            case "Register":
+                registerUser();
+                break;
+            case "Login":
+                loginUser();
+                break;
+            case "Exit":
+                System.exit(0);
+                break;
+            default:
+                JOptionPane.showMessageDialog(null, "Invalid choice. Please try again.");
+                menu();
+                break;
+        }
+    }
+
+    private void registerUser() {// (Пётр , 2020)
+        firstName = JOptionPane.showInputDialog(null, "Enter Your First Name");
+        lastName = JOptionPane.showInputDialog(null, "Enter Your Last Name");
+        registerUser = JOptionPane.showInputDialog(null, "Create Username");
+        registerPass = JOptionPane.showInputDialog(null, "Create Password");
+
+        username = registerUser;
+        password = registerPass;
+
+        JOptionPane.showMessageDialog(null, "Registration Successful! You can now login.");
+        menu();
+    }
+
+    private void loginUser() {// (Пётр , 2020)
+        String loginUsername = JOptionPane.showInputDialog(null, "Enter Your Username:");
+        String loginPassword = JOptionPane.showInputDialog(null, "Enter Your Password:");
+
+        if (loginUsername.equals(username) && loginPassword.equals(password)) {//(Farrell, 2022)
+            JOptionPane.showMessageDialog(null, "Welcome To EasyKanban" + firstName + " " + lastName + "! It Is Great To See You Again.");
+
+            String[] options = {"Add Tasks", "Show Task Status", "Quit"};
+            String choice = (String) JOptionPane.showInputDialog(null, "Logged In Menu", "Menu", JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
+
+            switch (choice) {
+                case "Add Tasks":
+                    addTasks();
+                    break;
+                case "Show Task Status":
+                    showTaskStatus();
+                    break;
+                case "Quit":
+                    int confirm = JOptionPane.showConfirmDialog(null, "Are you sure you want to exit?", "Quit", JOptionPane.YES_NO_OPTION);
+                    if (confirm == JOptionPane.YES_OPTION) {
+                        System.exit(0);
+                    }
+                    break;
+                default:
+                    JOptionPane.showMessageDialog(null, "Invalid choice. Please try again.");
+                    loginUser();
+                    break;
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(null, "Invalid username or password. Please try again.");
+            menu();
+        }
+    }
+
+    private void addTasks() {// (Пётр , 2020)
+        int numberOfTasks = Integer.parseInt(JOptionPane.showInputDialog(null, "Enter the number of tasks you wish to enter:"));
+
+        for (int i = 0; i < numberOfTasks; i++) {//(Farrell, 2022)
+            String taskName = JOptionPane.showInputDialog(null, "Add");
+            String taskDescription = JOptionPane.showInputDialog(null, "Please Enter Task Name");
+
+            while (taskDescription.length() > 50) {//(Farrell, 2022)
+                taskDescription = JOptionPane.showInputDialog(null, "Description should not exceed 50 characters. Please re-enter Task Description:");
+            }
+
+            if (taskDescription.isEmpty()) {//(Farrell, 2022)
+                JOptionPane.showMessageDialog(null, "No description was added. Task not captured.");
+                continue;
+            }
+
+            String author = JOptionPane.showInputDialog(null, "Enter Author of the Task:");
+            int duration = Integer.parseInt(JOptionPane.showInputDialog(null, "Enter Task Duration (in hours):"));
+
+            String[] statuses = {"To Do", "Doing", "Done"};//(Farrell, 2022)
+            String selectedStatus = (String) JOptionPane.showInputDialog(null, "Select Task Status", "Task Status", JOptionPane.PLAIN_MESSAGE, null, statuses, statuses[0]);
+
+            taskCount++;//(Farrell, 2022)
+            String taskID = generateTaskID(taskName, taskCount, lastName);
+            Task task = new Task(taskName, taskDescription, selectedStatus, author, duration);
+            taskStatusMap.get(selectedStatus).add(task);
+
+            StringBuilder taskInfo = new StringBuilder("Task ID: " + taskID + "\n");
+            taskInfo.append("Name: ").append(task.getName()).append("\n");
+            taskInfo.append("Description: ").append(task.getDescription()).append("\n");
+            taskInfo.append("Status: ").append(task.getStatus()).append("\n");
+            taskInfo.append("Author: ").append(task.getAuthor()).append("\n");
+            taskInfo.append("Duration: ").append(task.getDuration()).append(" hours\n");
+
+            JOptionPane.showMessageDialog(null, "Task successfully captured!\n\n" + taskInfo.toString());
+        }
+    }
+
+    public void showTaskStatus() {// (Пётр , 2020)
+        String[] statuses = {"To Do", "Doing", "Done"};
+        String selectedStatus = (String) JOptionPane.showInputDialog(null, "Select Task Status", "Task Status", JOptionPane.PLAIN_MESSAGE, null, statuses, statuses[0]);
+
+        List<Task> tasks = taskStatusMap.get(selectedStatus);
+        StringBuilder taskList = new StringBuilder("Tasks in " + selectedStatus + ":\n");
+
+        for (Task task : tasks) {
+            taskList.append(task.getName()).append("\n");
+        }
+
+        JOptionPane.showMessageDialog(null, taskList.toString());
+    }
+
+    private String generateTaskID(String taskName, int taskNumber, String lastName) {// (Пётр , 2020)
+        return taskName.substring(0, Math.min(taskName.length(), 3)).toUpperCase() + ":" + taskNumber + ":" + lastName.substring(Math.max(0, lastName.length() - 3)).toUpperCase();
+    }
+
+    public boolean validatePassword(String password) {// (Пётр , 2020)
+        if (password.length() >= 5) {
+            return true;
+        } else {
+            JOptionPane.showMessageDialog(null, "Incorrect Password, Must Have A Minimum Of 5 Or More Than 5 Characters ");
+            return false;
+        }
+    }
+
+    public boolean validateUsername(String username) {
+        if (username.contains("_")) {
+            return true;
+        } else {
+            JOptionPane.showMessageDialog(null, "Incorrect Username, It Must Contain An Underscore '_' ");
+            return false;
+        }
+    }
+    
+    public String printTaskDetails(Task task) {
+        String taskID = generateTaskID(task.getName(), taskCount, lastName);
+        return "Task ID: " + taskID + "\n" +
+                "Task Name: " + task.getName() + "\n" +
+                "Task Description: " + task.getDescription() + "\n" +
+                "Developer Details: " + task.getAuthor() + "\n" +
+                "Task Duration: " + task.getDuration() + " hours\n" +
+                "Task Status: " + task.getStatus();
+    }
+
+
+  
+
+    private static class Task {// (Пётр , 2020)
+        private final String name;
+        private final String description;
+        private final String status;
+        private final String author;
+        private final int duration;
+
+        public Task(String name, String description, String status, String author, int duration) {// (Пётр , 2020)
+            this.name = name;
+            this.description = description;
+            this.status = status;
+            this.author = author;
+            this.duration = duration;
+        }
+
+        public String getName() {// (Пётр , 2020)
+            return name;
+        }
+
+        public String getDescription() {// (Пётр , 2020)
+            return description;
+        }
+
+        public String getStatus() {// (Пётр , 2020)
+            return status;
+        }
+
+        public String getAuthor() {// (Пётр , 2020)
+            return author;
+        }
+
+        public int getDuration() {// (Пётр , 2020)
+            return duration;
+        }
+    }
+    
+    
+}
